@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const CustomTable = ({ columns, rows, onEdit, onDelete }) => {
+const CustomTable = ({ columns, rows, showActions, onEdit, onDelete }) => {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -21,7 +21,7 @@ const CustomTable = ({ columns, rows, onEdit, onDelete }) => {
                 {column.label}
               </TableCell>
             ))}
-            <TableCell align="right">Actions</TableCell>
+            {showActions && <TableCell align="right">Actions</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -32,22 +32,24 @@ const CustomTable = ({ columns, rows, onEdit, onDelete }) => {
                   {row[column.id]}
                 </TableCell>
               ))}
-              <TableCell align="right">
-                <IconButton
-                  aria-label="edit"
-                  size="small"
-                  onClick={() => onEdit(row.id)}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  aria-label="delete"
-                  size="small"
-                  onClick={() => onDelete(row.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
+              {showActions && (
+                <TableCell align="right">
+                  <IconButton
+                    aria-label="edit"
+                    size="small"
+                    onClick={() => onEdit(row.id)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    aria-label="delete"
+                    size="small"
+                    onClick={() => onDelete(row.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

@@ -133,7 +133,6 @@ const Vacations = () => {
   }
 
   const columns = [
-    { id: 'id', label: 'ID de Vacación' },
     { id: 'employee_id', label: 'ID de Empleado', align: 'right' },
     { id: 'vacation_start', label: 'Fecha desde', align: 'right' },
     { id: 'vacation_end', label: 'Fecha hasta', align: 'right' },
@@ -171,7 +170,7 @@ const Vacations = () => {
         </div>
       )}
 
-      <CustomTable columns={columns} rows={vacationsData.vacations} onEdit={handleEdit} onDelete={handleDelete} />
+      <CustomTable columns={columns} rows={vacationsData.vacations} onEdit={handleEdit} onDelete={handleDelete} showActions={true}/>
 
       <Pagination currentPage={currentPage} totalPages={vacationsData.total_pages} onPageChange={handlePageChange} />
     </div>

@@ -165,7 +165,7 @@ const Employees = () => {
         </div>
       )}
 
-      <CustomTable columns={columns} rows={employeesData.employees} onEdit={handleEdit} onDelete={handleDelete} />
+      <CustomTable columns={columns} rows={employeesData.employees} onEdit={handleEdit} onDelete={handleDelete} showActions={true}/>
 
       <Pagination currentPage={currentPage} totalPages={employeesData.total_pages} onPageChange={handlePageChange} />
     </div>
