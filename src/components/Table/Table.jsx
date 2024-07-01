@@ -6,8 +6,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const CustomTable = ({ columns, rows }) => {
+const CustomTable = ({ columns, rows, onEdit, onDelete }) => {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -18,6 +22,7 @@ const CustomTable = ({ columns, rows }) => {
                 {column.label}
               </TableCell>
             ))}
+            <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -28,6 +33,22 @@ const CustomTable = ({ columns, rows }) => {
                   {row[column.id]}
                 </TableCell>
               ))}
+              <TableCell align="right">
+                <IconButton 
+                  aria-label="edit" 
+                  size="small" 
+                  onClick={() => onEdit(row.id)}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton 
+                  aria-label="delete" 
+                  size="small" 
+                  onClick={() => onDelete(row.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
