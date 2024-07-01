@@ -6,7 +6,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,16 +33,16 @@ const CustomTable = ({ columns, rows, onEdit, onDelete }) => {
                 </TableCell>
               ))}
               <TableCell align="right">
-                <IconButton 
-                  aria-label="edit" 
-                  size="small" 
+                <IconButton
+                  aria-label="edit"
+                  size="small"
                   onClick={() => onEdit(row.id)}
                 >
                   <EditIcon />
                 </IconButton>
-                <IconButton 
-                  aria-label="delete" 
-                  size="small" 
+                <IconButton
+                  aria-label="delete"
+                  size="small"
                   onClick={() => onDelete(row.id)}
                 >
                   <DeleteIcon />
