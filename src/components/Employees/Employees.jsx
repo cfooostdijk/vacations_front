@@ -6,8 +6,11 @@ import Pagination from '../Pagination/Pagination';
 import TitleTable from '../TitleTable/TitleTable';
 import Form from '../Form/Form';
 import axiosInstance from '../../services/Axios';
+import { useAuth } from '../../context/AuthContext';
 
 const Employees = () => {
+  const { authToken } = useAuth();
+  console.log('Valor de authToken:', authToken);
   const [employeesData, setEmployeesData] = useState({
     employees: [],
     total_pages: 1,
@@ -19,8 +22,6 @@ const Employees = () => {
   const [showForm, setShowForm] = useState(false);
   const [editEmployee, setEditEmployee] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Estados para los filtros
   const [filters, setFilters] = useState([
     { name: 'first_name', label: 'Nombre', value: '' },
     { name: 'last_name', label: 'Apellido', value: '' },
@@ -33,7 +34,11 @@ const Employees = () => {
       setLoading(true);
       setError(null);
       try {
+        console.log('Token de autenticación:', authToken); // Verifica el token aquí
         const response = await axiosInstance.get('/api/v1/employees', {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          },
           params: {
             page,
             ...filters.reduce((acc, filter) => {
@@ -47,13 +52,14 @@ const Employees = () => {
         console.log('Respuesta del backend para empleados:', response.data);
       } catch (err) {
         setError(err);
+        console.error('Error al obtener empleados:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEmployees(currentPage); // Cargar la página inicial al montar el componente
-  }, [currentPage, filters]);
+    fetchEmployees(currentPage);
+  }, [currentPage, filters, authToken]); 
 
   const handleEdit = (id) => {
     const employeeToEdit = employeesData.employees.find(employee => employee.id === id);
@@ -63,14 +69,18 @@ const Employees = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axiosInstance.delete(`/api/v1/employees/${id}`);
+      await axiosInstance.delete(`/api/v1/employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
       setEmployeesData({
         ...employeesData,
         employees: employeesData.employees.filter(employee => employee.id !== id)
       });
     } catch (err) {
       setError(err);
-      console.error(`Error deleting employee with id ${id}:`, err);
+      console.error(`Error al eliminar empleado con ID ${id}:`, err);
     }
   };
 
@@ -87,7 +97,11 @@ const Employees = () => {
   const handleSubmitForm = async (formData) => {
     try {
       if (editEmployee) {
-        await axiosInstance.put(`/api/v1/employees/${editEmployee.id}`, formData);
+        await axiosInstance.put(`/api/v1/employees/${editEmployee.id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
         const updatedEmployees = employeesData.employees.map(employee => {
           if (employee.id === editEmployee.id) {
             return { ...employee, ...formData };
@@ -99,7 +113,11 @@ const Employees = () => {
           employees: updatedEmployees
         });
       } else {
-        const response = await axiosInstance.post('/api/v1/employees', formData);
+        const response = await axiosInstance.post('/api/v1/employees', formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
         setEmployeesData({
           ...employeesData,
           employees: [...employeesData.employees, response.data]
@@ -109,17 +127,17 @@ const Employees = () => {
       setEditEmployee(null);
     } catch (err) {
       setError(err);
-      console.error('Error saving employee:', err);
+      console.error('Error al guardar empleado:', err);
     }
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page); // Actualizar currentPage al hacer clic en una página
+    setCurrentPage(page);
   };
 
   const applyFilters = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reiniciar a la primera página al aplicar filtros
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -150,13 +168,12 @@ const Employees = () => {
       {showForm && (
         <div style={{ marginBottom: '1rem' }}>
           <Form
-            entityType="employee" // Opcional: Puedes pasar 'vacation' si editas vacaciones
+            entityType="employee"
             fields={[
               { id: 'first_name', label: 'Nombre' },
               { id: 'last_name', label: 'Apellido' },
               { id: 'email', label: 'Email' },
               { id: 'lider', label: 'Líder' }
-              // Agrega más campos si es necesario
             ]}
             initialData={editEmployee}
             onSubmit={handleSubmitForm}
@@ -165,7 +182,7 @@ const Employees = () => {
         </div>
       )}
 
-      <CustomTable columns={columns} rows={employeesData.employees} onEdit={handleEdit} onDelete={handleDelete} showActions={true}/>
+      <CustomTable columns={columns} rows={employeesData.employees} onEdit={handleEdit} onDelete={handleDelete} showActions={true} />
 
       <Pagination currentPage={currentPage} totalPages={employeesData.total_pages} onPageChange={handlePageChange} />
     </div>

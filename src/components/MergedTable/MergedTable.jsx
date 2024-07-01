@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import axiosInstance from '../../services/Axios';
 import Table from '../Table';
+import { useAuth } from '../../context/AuthContext'; // Importar el contexto de autenticación
 
 const MergedTable = () => {
+  const { authToken } = useAuth(); // Obtener el token de autenticación desde el contexto
   const [vacationsData, setVacationsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,8 +20,16 @@ const MergedTable = () => {
     const fetchData = async () => {
       try {
         const [employeesResponse, vacationsResponse] = await Promise.all([
-          axiosInstance.get('/api/v1/employees'),
-          axiosInstance.get('/api/v1/vacations')
+          axiosInstance.get('/api/v1/employees', {
+            headers: {
+              Authorization: `Bearer ${authToken}` // Incluir el token en la cabecera de la petición
+            }
+          }),
+          axiosInstance.get('/api/v1/vacations', {
+            headers: {
+              Authorization: `Bearer ${authToken}` // Incluir el token en la cabecera de la petición
+            }
+          })
         ]);
         setEmployeesData(employeesResponse.data);
         setVacationsData(vacationsResponse.data); // Corregir aquí
@@ -31,7 +41,7 @@ const MergedTable = () => {
     };
 
     fetchData();
-  }, []);
+  }, [authToken]); // Asegúrate de incluir authToken en las dependencias de useEffect
 
   if (loading) {
     return <Typography variant="body2" color="text.secondary" align="center">Cargando...</Typography>;

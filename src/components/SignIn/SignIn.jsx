@@ -15,11 +15,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useAuth } from '../../context/AuthContext';
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,16 +29,14 @@ export default function SignIn() {
     const email = data.get('email');
     const password = data.get('password');
 
-    console.log({
-      email,
-      password,
-    });
-
     try {
-      await signIn(email, password);
-      navigate('/home');
+      const token = await signIn(email, password); // Llama al servicio signIn para obtener el token
+      login(token); // Guarda el token en el contexto de autenticación
+      navigate('/home'); // Navega a la página de inicio después de iniciar sesión
+      console.log(token)
     } catch (error) {
       console.error('Error signing in:', error);
+      // Manejo de errores específico del componente SignIn
     }
   };
 

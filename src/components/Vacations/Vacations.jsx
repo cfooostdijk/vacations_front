@@ -7,8 +7,10 @@ import Pagination from '../Pagination/Pagination';
 import TitleTable from '../TitleTable';
 import Form from '../Form/Form';
 import axiosInstance from '../../services/Axios';
+import { useAuth } from '../../context/AuthContext';
 
 const Vacations = () => {
+  const { authToken } = useAuth();
   const [vacationsData, setVacationsData] = useState({
     vacations: [],
     total_pages: 1,
@@ -37,6 +39,9 @@ const Vacations = () => {
       setError(null);
       try {
         const response = await axiosInstance.get('/api/v1/vacations', {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          },
           params: {
             page,
             ...filters.reduce((acc, filter) => {
@@ -50,13 +55,14 @@ const Vacations = () => {
         console.log('Respuesta del backend para vacaciones:', response.data);
       } catch (err) {
         setError(err);
+        console.error('Error al obtener vacaciones:', err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchVacations(currentPage); // Cargar la página inicial al montar el componente
-  }, [currentPage, filters]);
+  }, [currentPage, filters, authToken]);
 
   const handleEdit = (id) => {
     const vacationToEdit = vacationsData.vacations.find(vacation => vacation.id === id);
@@ -66,7 +72,11 @@ const Vacations = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axiosInstance.delete(`/api/v1/vacations/${id}`);
+      await axiosInstance.delete(`/api/v1/vacations/${id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
       setVacationsData({
         ...vacationsData,
         vacations: vacationsData.vacations.filter(vacation => vacation.id !== id)
@@ -90,7 +100,11 @@ const Vacations = () => {
   const handleSubmitForm = async (formData) => {
     try {
       if (editVacation) {
-        await axiosInstance.put(`/api/v1/vacations/${editVacation.id}`, formData);
+        await axiosInstance.put(`/api/v1/vacations/${editVacation.id}`, formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
         const updatedVacations = vacationsData.vacations.map(vacation => {
           if (vacation.id === editVacation.id) {
             return { ...vacation, ...formData };
@@ -102,7 +116,11 @@ const Vacations = () => {
           vacations: updatedVacations
         });
       } else {
-        const response = await axiosInstance.post('/api/v1/vacations', formData);
+        const response = await axiosInstance.post('/api/v1/vacations', formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
         setVacationsData({
           ...vacationsData,
           vacations: [...vacationsData.vacations, response.data]

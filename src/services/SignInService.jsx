@@ -9,7 +9,7 @@ const signIn = async (email, password) => {
       },
     });
     console.log('SignIn successful:', response.data);
-    return response.data;
+    return response.data.token; // Devuelve solo el token desde el servicio
   } catch (error) {
     console.error('Error signing in:', error);
     console.log('Error response:', error.response);
