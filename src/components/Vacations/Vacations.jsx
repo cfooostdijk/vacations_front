@@ -1,4 +1,3 @@
-// src/components/Vacations/Vacations.jsx
 import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import CustomTable from '../Table/Table';
@@ -8,6 +7,8 @@ import TitleTable from '../TitleTable';
 import Form from '../Form/Form';
 import axiosInstance from '../../services/Axios';
 import { useAuth } from '../../context/AuthContext';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Vacations = () => {
   const { authToken } = useAuth();
@@ -23,9 +24,8 @@ const Vacations = () => {
   const [editVacation, setEditVacation] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Estados para los filtros
   const [filters, setFilters] = useState([
-    { name: 'employee_id', label: 'ID de Empleado', value: '' },
+    { name: 'file_number', label: 'ID Empleado', value: '' },
     { name: 'vacation_start', label: 'Fecha desde', value: '' },
     { name: 'vacation_end', label: 'Fecha hasta', value: '' },
     { name: 'kind', label: 'Tipo', value: '' },
@@ -38,16 +38,22 @@ const Vacations = () => {
       setLoading(true);
       setError(null);
       try {
+        const formattedFilters = filters.reduce((acc, filter) => {
+          if (filter.name === 'vacation_start' || filter.name === 'vacation_end') {
+            acc[filter.name] = filter.value; // Mantenemos el formato ingresado por el usuario
+          } else {
+            acc[filter.name] = filter.value;
+          }
+          return acc;
+        }, {});
+
         const response = await axiosInstance.get('/api/v1/vacations', {
           headers: {
             Authorization: `Bearer ${authToken}`
           },
           params: {
             page,
-            ...filters.reduce((acc, filter) => {
-              acc[filter.name] = filter.value;
-              return acc;
-            }, {}),
+            ...formattedFilters,
           }
         });
         setVacationsData(response.data);
@@ -134,7 +140,7 @@ const Vacations = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page); // Actualizar currentPage al hacer clic en una página
+    setCurrentPage(page);
   };
 
   const applyFilters = (newFilters) => {
@@ -151,7 +157,7 @@ const Vacations = () => {
   }
 
   const columns = [
-    { id: 'employee_id', label: 'ID de Empleado', align: 'right' },
+    { id: 'file_number', label: 'ID Empleado', align: 'right' },
     { id: 'vacation_start', label: 'Fecha desde', align: 'right' },
     { id: 'vacation_end', label: 'Fecha hasta', align: 'right' },
     { id: 'kind', label: 'Tipo', align: 'right' },
@@ -171,15 +177,14 @@ const Vacations = () => {
       {showForm && (
         <div style={{ marginBottom: '1rem' }}>
           <Form
-            entityType="vacation" // Opcional: Puedes pasar 'vacation' si editas vacaciones
+            entityType="vacation"
             fields={[
-              { id: 'employee_id', label: 'ID de Empleado' },
-              { id: 'vacation_start', label: 'Fecha desde' },
-              { id: 'vacation_end', label: 'Fecha hasta' },
+              { id: 'employee_id', label: 'ID Empleado' },
+              { id: 'vacation_start', label: 'Fecha desde', inputComponent: <DatePicker selected={editVacation ? new Date(editVacation.vacation_start) : null} onChange={date => setEditVacation({...editVacation, vacation_start: date})} dateFormat="dd/MM/yyyy" /> },
+              { id: 'vacation_end', label: 'Fecha hasta', inputComponent: <DatePicker selected={editVacation ? new Date(editVacation.vacation_end) : null} onChange={date => setEditVacation({...editVacation, vacation_end: date})} dateFormat="dd/MM/yyyy" /> },
               { id: 'kind', label: 'Tipo' },
               { id: 'motive', label: 'Motivo' },
               { id: 'status', label: 'Estado' }
-              // Agrega más campos si es necesario
             ]}
             initialData={editVacation}
             onSubmit={handleSubmitForm}
@@ -188,7 +193,7 @@ const Vacations = () => {
         </div>
       )}
 
-      <CustomTable columns={columns} rows={vacationsData.vacations} onEdit={handleEdit} onDelete={handleDelete} showActions={true}/>
+      <CustomTable columns={columns} rows={vacationsData.vacations} onEdit={handleEdit} onDelete={handleDelete} showActions={true} />
 
       <Pagination currentPage={currentPage} totalPages={vacationsData.total_pages} onPageChange={handlePageChange} />
     </div>

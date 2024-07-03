@@ -23,6 +23,7 @@ const Employees = () => {
   const [editEmployee, setEditEmployee] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState([
+    { name: 'file_number', label: 'ID Empleado', value: '' },
     { name: 'first_name', label: 'Nombre', value: '' },
     { name: 'last_name', label: 'Apellido', value: '' },
     { name: 'email', label: 'Email', value: '' },
@@ -149,7 +150,7 @@ const Employees = () => {
   }
 
   const columns = [
-    { id: 'id', label: 'ID de Empleado' },
+    { id: 'file_number', label: 'ID Empleado' },
     { id: 'first_name', label: 'Nombre', align: 'right' },
     { id: 'last_name', label: 'Apellido', align: 'right' },
     { id: 'email', label: 'Email', align: 'right' },
@@ -170,6 +171,7 @@ const Employees = () => {
           <Form
             entityType="employee"
             fields={[
+              { id: 'file_number', label: 'Id Empleado' },
               { id: 'first_name', label: 'Nombre' },
               { id: 'last_name', label: 'Apellido' },
               { id: 'email', label: 'Email' },

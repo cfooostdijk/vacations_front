@@ -2,46 +2,124 @@ import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import axiosInstance from '../../services/Axios';
 import Table from '../Table';
-import { useAuth } from '../../context/AuthContext'; // Importar el contexto de autenticación
+import FilterForm from '../FilterForm/FilterForm';
+import Pagination from '../Pagination/Pagination';
+import { useAuth } from '../../context/AuthContext';
 
 const MergedTable = () => {
-  const { authToken } = useAuth(); // Obtener el token de autenticación desde el contexto
-  const [vacationsData, setVacationsData] = useState([]);
+  const { authToken } = useAuth();
+  const [mergedData, setMergedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [employeesData, setEmployeesData] = useState({
-    employees: [],
-    total_pages: 1,
-    current_page: 1,
-    total_count: 0
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState([
+    { name: 'file_number', label: 'ID', value: '' },
+    { name: 'full_name', label: 'Nombre', value: '' },
+    { name: 'email', label: 'Email', value: '' },
+    { name: 'lider', label: 'Líder', value: '' },
+    { name: 'vacation_start', label: 'Fecha desde', value: '' },
+    { name: 'vacation_end', label: 'Fecha hasta', value: '' },
+    { name: 'kind', label: 'Tipo', value: '' },
+    { name: 'motive', label: 'Motivo', value: '' },
+    { name: 'status', label: 'Estado', value: '' },
+  ]);
+
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const [employeesResponse, vacationsResponse] = await Promise.all([
-          axiosInstance.get('/api/v1/employees', {
-            headers: {
-              Authorization: `Bearer ${authToken}` // Incluir el token en la cabecera de la petición
-            }
-          }),
-          axiosInstance.get('/api/v1/vacations', {
-            headers: {
-              Authorization: `Bearer ${authToken}` // Incluir el token en la cabecera de la petición
-            }
-          })
-        ]);
-        setEmployeesData(employeesResponse.data);
-        setVacationsData(vacationsResponse.data); // Corregir aquí
+        const response = await axiosInstance.get('/api/v1/vacations', {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          },
+          params: {
+            page: currentPage,
+            ...filters.reduce((acc, filter) => {
+              acc[filter.name] = filter.value;
+              return acc;
+            }, {}),
+          }
+        });
+
+        const { vacations, total_pages } = response.data;
+
+        if (Array.isArray(vacations)) {
+          const employeeIds = vacations.map(vacation => vacation.employee_id);
+          const uniqueEmployeeIds = [...new Set(employeeIds)];
+
+          const employeesData = await fetchEmployeesData(uniqueEmployeeIds);
+
+          // Transformar los datos para mostrar
+          const mergedData = buildMergedData(vacations, employeesData);
+          setMergedData(mergedData);
+          setTotalPages(total_pages);
+        } else {
+          setError(new Error('Data retrieved is not in the expected format'));
+        }
       } catch (err) {
         setError(err);
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
     };
 
+    const fetchEmployeesData = async (employeeIds) => {
+      const promises = employeeIds.map(async (employeeId) => {
+        try {
+          const response = await axiosInstance.get(`/api/v1/employees/${employeeId}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+          return response.data;
+        } catch (err) {
+          console.error(`Error fetching employee data for employee ID ${employeeId}:`, err);
+          return null;
+        }
+      });
+
+      const employeesData = await Promise.all(promises);
+      return employeesData.filter(employee => employee !== null); // Filter out null values
+    };
+
+    const buildMergedData = (vacations, employeesData) => {
+      const mergedData = [];
+
+      vacations.forEach(vacation => {
+        const employee = employeesData.find(employee => employee.id === vacation.employee_id);
+        if (employee) {
+          mergedData.push({
+            employee_id: employee.file_number,
+            employee_name: `${employee.first_name} ${employee.last_name}`,
+            email: employee.email,
+            lider: employee.lider,
+            vacation_start: vacation.vacation_start,
+            vacation_end: vacation.vacation_end,
+            kind: vacation.kind,
+            motive: vacation.motive,
+            status: vacation.status
+          });
+        }
+      });
+
+      return mergedData;
+    };
+
     fetchData();
-  }, [authToken]); // Asegúrate de incluir authToken en las dependencias de useEffect
+  }, [currentPage, filters, authToken]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const applyFilters = (newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Resetear a la primera página al aplicar nuevos filtros
+  };
 
   if (loading) {
     return <Typography variant="body2" color="text.secondary" align="center">Cargando...</Typography>;
@@ -50,21 +128,6 @@ const MergedTable = () => {
   if (error) {
     return <Typography variant="body2" color="text.secondary" align="center">Error: {error.message}</Typography>;
   }
-
-  const mergedData = vacationsData.vacations.map(vacation => {
-    const employee = employeesData.employees.find(emp => emp.id === vacation.employee_id);
-    return {
-      employee_id: vacation.employee_id,
-      employee_name: employee ? `${employee.first_name} ${employee.last_name}` : 'N/A',
-      email: employee ? `${employee.email}` : 'N/A',
-      lider: employee ? `${employee.lider}` : 'N/A',
-      vacation_start: vacation.vacation_start,
-      vacation_end: vacation.vacation_end,
-      kind: vacation.kind,
-      motive: vacation.motive,
-      status: vacation.status
-    };
-  });
 
   const columns = [
     { id: 'employee_id', label: 'ID', align: 'right' },
@@ -81,7 +144,15 @@ const MergedTable = () => {
   return (
     <div>
       <Typography variant="h4" align="center">Información Fusionada</Typography>
+
+      <FilterForm
+        filters={filters}
+        onApply={applyFilters}
+      />
+
       <Table columns={columns} rows={mergedData} />
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import SignOut from '../../components/SignOut/SignOut';
 import Employees from '../../components/Employees';
 import Vacations from '../../components/Vacations';
 import MergedTable from '../../components/MergedTable/MergedTable';
+import ImportFile from '../../components/ImportFile';
 import Home from '../Home';
 import { AuthProvider } from '../../context/AuthContext';
 import PrivateRoute from '../../services/PrivateRoute';
@@ -23,6 +24,7 @@ function Initial() {
             <Route path="/employees" element={<Employees />} />
             <Route path="/vacations" element={<Vacations />} />
             <Route path="/data" element={<MergedTable />} />
+            <Route path="/import_file" element={<ImportFile />} />
           </Route>
         </Routes>
       </BrowserRouter>

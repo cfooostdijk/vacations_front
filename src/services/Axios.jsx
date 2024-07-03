@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'https://vacations-back-1jco.onrender.com';
+const apiUrl = 'http://localhost:3000';
 
 const axiosInstance = axios.create({
   baseURL: apiUrl,

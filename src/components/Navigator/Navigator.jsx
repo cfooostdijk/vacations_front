@@ -12,6 +12,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import BadgeIcon from '@mui/icons-material/Badge';
 import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
 import DataThresholdingIcon from '@mui/icons-material/DataThresholding';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
 
 const categories = [
   {
@@ -26,6 +27,7 @@ const categories = [
       { id: 'Employees', icon: <BadgeIcon /> },
       { id: 'Vacations', icon: <HolidayVillageIcon /> },
       { id: 'Full Data', icon: <DataThresholdingIcon /> },
+      { id: 'Import File', icon: <ImportExportIcon /> },
     ],
   },
 ];

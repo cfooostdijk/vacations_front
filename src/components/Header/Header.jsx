@@ -35,6 +35,7 @@ export default function Header(props) {
           <Tab label="Employees" value="Employees" />
           <Tab label="Vacations" value="Vacations" />
           <Tab label="Full Data" value="Full Data" />
+          <Tab label="Import File" value="Import File" />
         </Tabs>
       </Toolbar>
     </AppBar>

@@ -12,6 +12,7 @@ import Vacations from '../../components/Vacations';
 import MergedTable from '../../components/MergedTable/MergedTable';
 import SignOut from '../../components/SignOut'; // Assuming you have a SignOut component
 import theme from './theme';
+import ImportFile from '../../components/ImportFile';
 
 const drawerWidth = 256;
 
@@ -38,6 +39,9 @@ export default function Home() {
       break;
     case 'SignOut':
       content = <SignOut />;
+      break;
+    case 'Import File':
+      content = <ImportFile />;
       break;
     default:
       content = <MergedTable />;
