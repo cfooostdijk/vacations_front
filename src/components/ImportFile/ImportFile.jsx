@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import axiosInstance from '../../services/Axios';
+import { useAuth } from '../../context/AuthContext'; // Importar el contexto de autenticación
 
-const ImportFile = ({ authToken }) => {
+const ImportFile = () => {
+  const { authToken } = useAuth(); // Obtener el token de autenticación del contexto
   const [selectedFile, setSelectedFile] = useState(null);
   const [message, setMessage] = useState('');
 
@@ -19,6 +21,8 @@ const ImportFile = ({ authToken }) => {
 
       const formData = new FormData();
       formData.append('excel_file', selectedFile);
+
+      console.log('Auth Token:', authToken); // Verificar el token
 
       const response = await axiosInstance.post('/api/v1/import_file', formData, {
         headers: {
