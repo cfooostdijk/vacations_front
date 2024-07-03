@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-
 import signIn from '../../services/SignInService';
-import Copyright from '../Copyright';
-
+import AlertDialog from '../AlertDialog';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -22,6 +20,16 @@ const defaultTheme = createTheme();
 export default function SignIn() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [open, setOpen] = React.useState(false); // Estado para controlar el diálogo
+  const [dialogContent, setDialogContent] = React.useState({ title: '', message: '' }); // Contenido del diálogo
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,13 +38,25 @@ export default function SignIn() {
     const password = data.get('password');
 
     try {
-      const token = await signIn(email, password); // Llama al servicio signIn para obtener el token
-      login(token); // Guarda el token en el contexto de autenticación
-      navigate('/home'); // Navega a la página de inicio después de iniciar sesión
-      console.log(token)
+      const token = await signIn(email, password);
+      login(token);
+      setDialogContent({ title: 'Success', message: 'Sign in successful! Welcome to the application.' });
+      handleOpen(); // Abrir diálogo después de un inicio de sesión exitoso
+      setTimeout(() => {
+        navigate('/home');
+      }, 3000); // Redirigir después de 3 segundos (ajustar según sea necesario)
     } catch (error) {
       console.error('Error signing in:', error);
-      // Manejo de errores específico del componente SignIn
+      let errorMessage = 'Unknown error occurred.';
+      if (error.response) {
+        if (error.response.status === 401) {
+          errorMessage = 'Invalid email or password. Please try again.';
+        } else {
+          errorMessage = error.response.data.message || 'Unknown error occurred.';
+        }
+      }
+      setDialogContent({ title: 'Error', message: errorMessage });
+      handleOpen(); // Abrir diálogo después de un inicio de sesión fallido
     }
   };
 
@@ -96,7 +116,12 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <AlertDialog
+          open={open}
+          handleClose={handleClose}
+          title={dialogContent.title}
+          message={dialogContent.message}
+        />
       </Container>
     </ThemeProvider>
   );

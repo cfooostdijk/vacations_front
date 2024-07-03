@@ -1,9 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-
 import signUp from '../../services/SignUpService';
-import Copyright from '../Copyright';
-
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,11 +12,22 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import AlertDialog from '../AlertDialog';
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false); // Estado para controlar el diálogo
+  const [dialogContent, setDialogContent] = useState({ title: '', message: '' }); // Contenido del diálogo
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,13 +35,27 @@ export default function SignUp() {
     const email = formData.get('email');
     const password = formData.get('password');
 
-    console.log('Form data:', { email, password });
-
     try {
-      await signUp(email, password);
-      navigate('/signin');
+      const response = await signUp(email, password);
+      console.log('SignUp successful:', response);
+      setDialogContent({ title: 'Success', message: 'Sign up successful! Please use your credentials again in the signin.' });
+      handleOpen(); // Abrir diálogo después de un signup exitoso
+      // Redirigir al usuario al signin después de un tiempo
+      setTimeout(() => {
+        navigate('/signin');
+      }, 3000); // Redirigir después de 3 segundos (ajustar según sea necesario)
     } catch (error) {
       console.error('Error signing up:', error);
+      let errorMessage = 'Unknown error occurred.';
+      if (error.response) {
+        if (error.response.status === 422) {
+          errorMessage = 'Invalid email or password (6 chars min). Please try again.';
+        } else {
+          errorMessage = error.response.data.message || 'Unknown error occurred.';
+        }
+      }
+      setDialogContent({ title: 'Error', message: errorMessage });
+      handleOpen(); // Abrir diálogo después de un signup fallido
     }
   };
 
@@ -96,7 +118,12 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <AlertDialog
+          open={open}
+          handleClose={handleClose}
+          title={dialogContent.title}
+          message={dialogContent.message}
+        />
       </Container>
     </ThemeProvider>
   );

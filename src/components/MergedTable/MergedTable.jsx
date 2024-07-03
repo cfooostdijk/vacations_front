@@ -23,7 +23,6 @@ const MergedTable = () => {
     { name: 'motive', label: 'Motivo', value: '' },
     { name: 'status', label: 'Estado', value: '' },
   ]);
-
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -36,11 +35,11 @@ const MergedTable = () => {
             Authorization: `Bearer ${authToken}`
           },
           params: {
-            page: currentPage,
             ...filters.reduce((acc, filter) => {
               acc[filter.name] = filter.value;
               return acc;
             }, {}),
+            page: currentPage,
           }
         });
 
@@ -51,9 +50,8 @@ const MergedTable = () => {
           const uniqueEmployeeIds = [...new Set(employeeIds)];
 
           const employeesData = await fetchEmployeesData(uniqueEmployeeIds);
-
-          // Transformar los datos para mostrar
-          const mergedData = buildMergedData(vacations, employeesData);
+          const filteredVacations = filterVacationsByEmployees(vacations, employeesData);
+          const mergedData = buildMergedData(filteredVacations, employeesData);
           setMergedData(mergedData);
           setTotalPages(total_pages);
         } else {
@@ -84,6 +82,28 @@ const MergedTable = () => {
 
       const employeesData = await Promise.all(promises);
       return employeesData.filter(employee => employee !== null); // Filter out null values
+    };
+
+    const filterVacationsByEmployees = (vacations, employeesData) => {
+      const employeeFilters = filters.filter(filter => ['file_number', 'full_name', 'email', 'lider'].includes(filter.name));
+      if (employeeFilters.length === 0) {
+        return vacations;
+      }
+
+      const filteredEmployeeIds = employeesData
+        .filter(employee => {
+          return employeeFilters.every(filter => {
+            const value = filter.value.toLowerCase();
+            if (filter.name === 'full_name') {
+              const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
+              return fullName.includes(value);
+            }
+            return employee[filter.name]?.toString().toLowerCase().includes(value);
+          });
+        })
+        .map(employee => employee.id);
+
+      return vacations.filter(vacation => filteredEmployeeIds.includes(vacation.employee_id));
     };
 
     const buildMergedData = (vacations, employeesData) => {
@@ -118,7 +138,7 @@ const MergedTable = () => {
 
   const applyFilters = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Resetear a la primera página al aplicar nuevos filtros
+    setCurrentPage(1); // Reset to the first page when applying new filters
   };
 
   if (loading) {
