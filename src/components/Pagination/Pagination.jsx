@@ -1,4 +1,3 @@
-// src/components/Pagination/Pagination.jsx
 import React from 'react';
 import Button from '@mui/material/Button';
 

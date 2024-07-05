@@ -8,10 +8,10 @@ const signOut = async () => {
       },
     });
 
-    console.log('SignOut successful:', response.data);
+    // console.log('SignOut successful:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error signing out:', error);
+    // console.error('Error signing out:', error);
     throw error;
   }
 };

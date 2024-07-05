@@ -40,7 +40,7 @@ const Vacations = () => {
       try {
         const formattedFilters = filters.reduce((acc, filter) => {
           if (filter.name === 'vacation_start' || filter.name === 'vacation_end') {
-            acc[filter.name] = filter.value; // Mantenemos el formato ingresado por el usuario
+            acc[filter.name] = filter.value;
           } else {
             acc[filter.name] = filter.value;
           }
@@ -58,16 +58,16 @@ const Vacations = () => {
         });
         setVacationsData(response.data);
         setCurrentPage(response.data.current_page);
-        console.log('Respuesta del backend para vacaciones:', response.data);
+        // console.log('Respuesta del backend para vacaciones:', response.data);
       } catch (err) {
         setError(err);
-        console.error('Error al obtener vacaciones:', err);
+        // console.error('Error al obtener vacaciones:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchVacations(currentPage); // Cargar la página inicial al montar el componente
+    fetchVacations(currentPage);
   }, [currentPage, filters, authToken]);
 
   const handleEdit = (id) => {
@@ -89,7 +89,7 @@ const Vacations = () => {
       });
     } catch (err) {
       setError(err);
-      console.error(`Error deleting vacation with id ${id}:`, err);
+      // console.error(`Error deleting vacation with id ${id}:`, err);
     }
   };
 
@@ -135,7 +135,7 @@ const Vacations = () => {
       setShowForm(false);
       setEditVacation(null);
     } catch (err) {
-      console.error('Error saving vacation:', err);
+      // console.error('Error saving vacation:', err);
     }
   };
 
@@ -145,7 +145,7 @@ const Vacations = () => {
 
   const applyFilters = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reiniciar a la primera página al aplicar filtros
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -179,7 +179,7 @@ const Vacations = () => {
           <Form
             entityType="vacation"
             fields={[
-              { id: 'employee_id', label: 'ID Empleado' },
+              { id: 'file_number', label: 'ID Empleado' },
               { id: 'vacation_start', label: 'Fecha desde', inputComponent: <DatePicker selected={editVacation ? new Date(editVacation.vacation_start) : null} onChange={date => setEditVacation({...editVacation, vacation_start: date})} dateFormat="dd/MM/yyyy" /> },
               { id: 'vacation_end', label: 'Fecha hasta', inputComponent: <DatePicker selected={editVacation ? new Date(editVacation.vacation_end) : null} onChange={date => setEditVacation({...editVacation, vacation_end: date})} dateFormat="dd/MM/yyyy" /> },
               { id: 'kind', label: 'Tipo' },

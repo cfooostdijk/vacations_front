@@ -18,8 +18,8 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false); // Estado para controlar el diálogo
-  const [dialogContent, setDialogContent] = useState({ title: '', message: '' }); // Contenido del diálogo
+  const [open, setOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState({ title: '', message: '' });
 
   const handleOpen = () => {
     setOpen(true);
@@ -37,15 +37,14 @@ export default function SignUp() {
 
     try {
       const response = await signUp(email, password);
-      console.log('SignUp successful:', response);
+      // console.log('SignUp successful:', response);
       setDialogContent({ title: 'Success', message: 'Sign up successful! Please use your credentials again in the signin.' });
-      handleOpen(); // Abrir diálogo después de un signup exitoso
-      // Redirigir al usuario al signin después de un tiempo
+      handleOpen();
       setTimeout(() => {
         navigate('/signin');
-      }, 3000); // Redirigir después de 3 segundos (ajustar según sea necesario)
+      }, 3000);
     } catch (error) {
-      console.error('Error signing up:', error);
+      // console.error('Error signing up:', error);
       let errorMessage = 'Unknown error occurred.';
       if (error.response) {
         if (error.response.status === 422) {
@@ -55,7 +54,7 @@ export default function SignUp() {
         }
       }
       setDialogContent({ title: 'Error', message: errorMessage });
-      handleOpen(); // Abrir diálogo después de un signup fallido
+      handleOpen();
     }
   };
 

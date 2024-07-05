@@ -10,7 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const Employees = () => {
   const { authToken } = useAuth();
-  console.log('Valor de authToken:', authToken);
+  // console.log('Valor de authToken:', authToken);
   const [employeesData, setEmployeesData] = useState({
     employees: [],
     total_pages: 1,
@@ -35,7 +35,7 @@ const Employees = () => {
       setLoading(true);
       setError(null);
       try {
-        console.log('Token de autenticación:', authToken); // Verifica el token aquí
+        // console.log('Token de autenticación:', authToken);
         const response = await axiosInstance.get('/api/v1/employees', {
           headers: {
             Authorization: `Bearer ${authToken}`
@@ -50,17 +50,17 @@ const Employees = () => {
         });
         setEmployeesData(response.data);
         setCurrentPage(response.data.current_page);
-        console.log('Respuesta del backend para empleados:', response.data);
+        // console.log('Respuesta del backend para empleados:', response.data);
       } catch (err) {
         setError(err);
-        console.error('Error al obtener empleados:', err);
+        // console.error('Error al obtener empleados:', err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchEmployees(currentPage);
-  }, [currentPage, filters, authToken]); 
+  }, [currentPage, filters, authToken]);
 
   const handleEdit = (id) => {
     const employeeToEdit = employeesData.employees.find(employee => employee.id === id);
@@ -81,7 +81,7 @@ const Employees = () => {
       });
     } catch (err) {
       setError(err);
-      console.error(`Error al eliminar empleado con ID ${id}:`, err);
+      // console.error(`Error al eliminar empleado con ID ${id}:`, err);
     }
   };
 
@@ -128,7 +128,7 @@ const Employees = () => {
       setEditEmployee(null);
     } catch (err) {
       setError(err);
-      console.error('Error al guardar empleado:', err);
+      // console.error('Error al guardar empleado:', err);
     }
   };
 
@@ -146,7 +146,14 @@ const Employees = () => {
   }
 
   if (error) {
-    return <Typography variant="body2" color="text.secondary" align="center">Error: {error.message}</Typography>;
+    return (
+      <Typography variant="body2" color="text.secondary" align="center">
+        Error:
+          {error.response.data.errors.map((errorMessage, index) => (
+            <li key={index}>{errorMessage}</li>
+          ))}
+      </Typography>
+    );
   }
 
   const columns = [

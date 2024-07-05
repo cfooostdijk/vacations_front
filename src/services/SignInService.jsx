@@ -8,11 +8,11 @@ const signIn = async (email, password) => {
         password,
       },
     });
-    console.log('SignIn successful:', response.data);
-    return response.data.token; // Devuelve solo el token desde el servicio
+    // console.log('SignIn successful:', response.data);
+    return response.data.token;
   } catch (error) {
-    console.error('Error signing in:', error);
-    console.log('Error response:', error.response);
+    // console.error('Error signing in:', error);
+    // console.log('Error response:', error.response);
     throw error;
   }
 };

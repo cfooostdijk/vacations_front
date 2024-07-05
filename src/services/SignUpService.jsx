@@ -8,11 +8,11 @@ const signUp = async (email, password) => {
         password,
       },
     });
-    console.log('SignUp successful:', response.data);
+    // console.log('SignUp successful:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error signing up:', error);
-    console.log('Error response:', error.response);
+    // console.error('Error signing up:', error);
+    // console.log('Error response:', error.response);
     throw error;
   }
 };

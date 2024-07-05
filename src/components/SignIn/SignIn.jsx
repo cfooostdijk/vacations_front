@@ -20,8 +20,8 @@ const defaultTheme = createTheme();
 export default function SignIn() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [open, setOpen] = React.useState(false); // Estado para controlar el diálogo
-  const [dialogContent, setDialogContent] = React.useState({ title: '', message: '' }); // Contenido del diálogo
+  const [open, setOpen] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState({ title: '', message: '' });
 
   const handleOpen = () => {
     setOpen(true);
@@ -41,12 +41,12 @@ export default function SignIn() {
       const token = await signIn(email, password);
       login(token);
       setDialogContent({ title: 'Success', message: 'Sign in successful! Welcome to the application.' });
-      handleOpen(); // Abrir diálogo después de un inicio de sesión exitoso
+      handleOpen();
       setTimeout(() => {
         navigate('/home');
-      }, 3000); // Redirigir después de 3 segundos (ajustar según sea necesario)
+      }, 3000);
     } catch (error) {
-      console.error('Error signing in:', error);
+      // console.error('Error signing in:', error);
       let errorMessage = 'Unknown error occurred.';
       if (error.response) {
         if (error.response.status === 401) {
@@ -56,7 +56,7 @@ export default function SignIn() {
         }
       }
       setDialogContent({ title: 'Error', message: errorMessage });
-      handleOpen(); // Abrir diálogo después de un inicio de sesión fallido
+      handleOpen();
     }
   };
 

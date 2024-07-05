@@ -7,20 +7,19 @@ import AlertDialog from '../AlertDialog';
 const SignOut = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false); // Estado para controlar el diálogo
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const handleSignOut = async () => {
       try {
-        setOpen(true); // Abrir el diálogo al comenzar el proceso de cierre de sesión
+        setOpen(true);
         await signOut();
         logout();
-        // Esperar 1 segundo antes de redirigir al signin
         setTimeout(() => {
           navigate('/signin');
         }, 10000);
       } catch (error) {
-        console.error('Error signing out:', error);
+        // console.error('Error signing out:', error);
         navigate('/signin');
       }
     };

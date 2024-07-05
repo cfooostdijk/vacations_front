@@ -13,10 +13,11 @@ const MergedTable = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState([
-    { name: 'file_number', label: 'ID', value: '' },
-    { name: 'full_name', label: 'Nombre', value: '' },
-    { name: 'email', label: 'Email', value: '' },
-    { name: 'lider', label: 'Líder', value: '' },
+    // TO FIX EMPLOYEES FILTERS
+    // { name: 'file_number', label: 'ID', value: '' },
+    // { name: 'full_name', label: 'Nombre', value: '' },
+    // { name: 'email', label: 'Email', value: '' },
+    // { name: 'lider', label: 'Líder', value: '' },
     { name: 'vacation_start', label: 'Fecha desde', value: '' },
     { name: 'vacation_end', label: 'Fecha hasta', value: '' },
     { name: 'kind', label: 'Tipo', value: '' },
@@ -59,7 +60,7 @@ const MergedTable = () => {
         }
       } catch (err) {
         setError(err);
-        console.error('Error fetching data:', err);
+        // console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
@@ -75,7 +76,7 @@ const MergedTable = () => {
           });
           return response.data;
         } catch (err) {
-          console.error(`Error fetching employee data for employee ID ${employeeId}:`, err);
+          // console.error(`Error fetching employee data for employee ID ${employeeId}:`, err);
           return null;
         }
       });
@@ -138,7 +139,7 @@ const MergedTable = () => {
 
   const applyFilters = (newFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to the first page when applying new filters
+    setCurrentPage(1);
   };
 
   if (loading) {
